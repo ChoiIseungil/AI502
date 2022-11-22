@@ -17,7 +17,10 @@ class VGG(nn.Module):
     def __init__(self, vgg_name, num_classes=200):
         super(VGG, self).__init__()
         self.features = self._make_layers(cfg[vgg_name])
-        self.classifier = nn.Linear(512, num_classes)
+        self.classifier = nn.Sequential(
+            nn.Linear(512, num_classes),
+            nn.Dropout()
+        )
 
     def forward(self, x):
         out = self.features(x)
@@ -35,7 +38,7 @@ class VGG(nn.Module):
             else:
                 layers += [nn.Conv2d(in_channels, x, kernel_size=3, padding=1),
                            nn.BatchNorm2d(x),
-                           nn.Dropout(0.8),
+
                            nn.ReLU(inplace=True)]
                 in_channels = x
         layers += [nn.AvgPool2d(kernel_size=1, stride=1)]

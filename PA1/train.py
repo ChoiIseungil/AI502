@@ -61,7 +61,10 @@ def load_optimizer(model,learning_rate,optimizer_name):
     if optimizer_name=='':          return torch.optim.SGD(model.parameters(), lr=learning_rate)
     if optimizer_name=='momentum':  return torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
     if optimizer_name=='adagrad':   return torch.optim.Adagrad(model.parameters(), lr=learning_rate)
-    if optimizer_name=='adam':      return torch.optim.Adam(model.parameters(), lr=learning_rate)
+    if optimizer_name=='adam':   
+        print("Adam optimizer Loaded")   
+        return torch.optim.Adam(model.parameters(), lr=learning_rate)
+    raise Exception("Wrong Optimizer")
 
 def main():
     args = get_args()
@@ -106,8 +109,8 @@ def main():
                 ### FORWARD AND BACK PROP
                 logits, probas = model(features)
                 cost = F.cross_entropy(logits, targets)
-                if args.r=='l2': cost + 0.5 * sum( [ (p ** 2).sum()  for p in model.parameters() ] ) 
-                if args.r=='l1': cost + sum( [ (torch.abs(p)).sum() for p in model.parameters() ] )
+                if args.r=='l2': cost += 1e-4 * sum( [ (p ** 2).sum()  for p in model.parameters() ] )      #l2-lambda==1e-4
+                if args.r=='l1': cost += 1e-5 * sum( [ (torch.abs(p)).sum() for p in model.parameters() ] ) #l1-lambda==1e-3
                 optimizer.zero_grad()
                 
                 cost.backward()
